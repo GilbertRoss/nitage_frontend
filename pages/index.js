@@ -2,6 +2,7 @@ import { setRevalidateHeaders } from "next/dist/server/send-payload";
 import { useEffect, useState } from "react";
 import Carousel from "../components/Carousel";
 import Navbar from "../components/Navbar";
+import Table from "../components/Table";
 
 export default function Home() {
   const [invoices, setInvoices] = useState(null);
@@ -27,7 +28,7 @@ export default function Home() {
       setInvoices(null);
     } finally{
       setLoading(false);
-    }
+    };
     }
     getData();
   }, [])
@@ -40,9 +41,14 @@ export default function Home() {
         <div>{`There is a problem fetching the post data - ${error}`}</div>
       )}
       {invoices &&
-        <div className="container mx-auto">
+      <>
+        <div className="container mx-auto h-1/2">
           <Carousel invoices={invoices} />
-        </div>
+        <div className="divider"></div> 
+        <div className="font-bold text-4xl mb-8">Fatture degli anni precedenti</div>
+        <Table invoices={invoices}></Table>
+      </div>
+      </>
       }
     </>
   );
