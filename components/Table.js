@@ -1,9 +1,8 @@
-import { useEffect } from "react";
+
 
 const Table = (props) => {
-    useEffect(() => {
-        window.location.replace('#8')
-    },[])
+    const buttonClass = "py-2 px-4 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase";
+
     return (
         <div className="overflow-x-auto">
             <table className="table w-full">
@@ -38,7 +37,7 @@ const Table = (props) => {
                                         <td><div className="badge badge-error gap-2">
                                             {invoice.status}
                                         </div></td>
-                                        <td><button onClick={() => { window.open(invoice.url, '_blank').focus(); }} className="btn btn-primary">Link Fattura</button></td>
+                                        <td><button onClick={() => { window.open(invoice.url, '_blank').focus(); }} className={buttonClass}>Link Fattura</button></td>
                                     </tr>
                                 )
                             }

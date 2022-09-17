@@ -1,34 +1,81 @@
+import { useEffect, useState } from "react";
+
 const Card = (props) => {
+  const [month, setMonth] = useState(new Date().getMonth());
+  const [date, setDate] = useState();
+  const [id, setId] = useState();
+  const months = [
+    'Gennaio',
+    'Febbraio',
+    'Marzo',
+    'Aprile',
+    'Maggio',
+    'Giugno',
+    'Luglio',
+    'Agosto',
+    'Settembre',
+    'Ottobre',
+    'Novembre',
+    'Dicembre'
+  ]
+
+  const onChangeDate = (event) => {
+    setDate(event.target.value)
+  }
+
+  const changeDate = () => {
+    fetch('http://localhost:8080/invoices', {
+      method: 'PATCH',
+      body: JSON.stringify({
+        id: id,
+        date: date,
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    }).then((response) => response.json()).then(response => {console.log(response)}).catch((err) => console.log(err.message))
+  }
+
+
+  const buttonClass = "py-2 px-4 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase";
   return (
     <>
+    <input type="checkbox" id="edit-modal" className="modal-toggle" />
+<div className="modal">
+  <div className="modal-box">
+  <label for="edit-modal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <div className="font-bold text-2xl mt-4 mb-4">Modifica data di pagamento</div>
+    <input type="date" value={date} onChange={onChangeDate}  class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date"></input>
+    <div className="modal-action">
+      <label onClick={changeDate} htmlFor="edit-modal" className="cursor-pointer mb-2 py-2 px-2 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase">Salva</label>
+    </div>
+  </div>
+</div>
       <div className="flex justify-center w-full py-8 gap-2">
-        <a href="#0" className="btn btn-md">Gennaio</a>
-        <a href="#1" className="btn btn-md">Febbraio</a>
-        <a href="#2" className="btn btn-md">Marzo</a>
-        <a href="#3" className="btn btn-md">Aprile</a>
-        <a href="#4" className="btn btn-md">Maggio</a>
-        <a href="#5" className="btn btn-md">Giugno</a>
-        <a href="#6" className="btn btn-md">Luglio</a>
-        <a href="#7" className="btn btn-md">Agosto</a>
-        <a href="#8" className="btn btn-md">Settembre</a>
-        <a href="#9" className="btn btn-md">Ottobre</a>
-        <a href="#10" className="btn btn-md">Novembre</a>
-        <a href="#11" className="btn btn-md">Dicembre</a>
+        <button onClick={() => setMonth(0)} className={buttonClass}>Gennaio</button>
+        <button onClick={() => {setMonth(1)}} className={buttonClass}>Febbraio</button>
+        <button onClick={() => {setMonth(2)}} className={buttonClass}>Marzo</button>
+        <button onClick={() => {setMonth(3)}} className={buttonClass}>Aprile</button>
+        <button onClick={() => {setMonth(4)}} className={buttonClass}>Maggio</button>
+        <button onClick={() => {setMonth(5)}} className={buttonClass}>Giugno</button>
+        <button onClick={() => {setMonth(6)}} className={buttonClass}>Luglio</button>
+        <button onClick={() => {setMonth(7)}} className={buttonClass}>Agosto</button>
+        <button onClick={() => {setMonth(8)}} className={buttonClass}>Settembre</button>
+        <button onClick={() => {setMonth(9)}} className={buttonClass}>Ottobre</button>
+        <button onClick={() => {setMonth(10)}} className={buttonClass}>Novembre</button>
+        <button onClick={() => {setMonth(11)}} className={buttonClass}>Dicembre</button>
 
       </div>
+      <div className="font-bold text-4xl mb-8">{months[month]}</div>
       <div className="flex flex-wrap">
-        {() =>  {
-          if(window.location.hash == '0'){
-            console.log(window.location.hash)
-            return (
-              <div id="0" className= "w-1/4">
-         
-         {
+      {
            [...props.invoices.invoices].map((invoice, k) => {
-             if(new Date(invoice.next_due_date).getMonth() == 0 && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
+             if(new Date(invoice.next_due_date).getMonth() == month && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
              return (
-               <div key={k} className="card w-96 bg-base-100 shadow-xl mr-4">
+            <>
+               <div key={k} className="card w-96 bg-base-100 shadow-xl mr-4 mt-4">
                <div className="card-body">
+               <span className={invoice.status =='not_paid' ? "indicator-item badge badge-error" : "indicator-item badge badge-success gap-8" }>{invoice.status}</span> 
                <h2 className="card-title">{invoice.company_name}</h2>
                <div>ID azienda: {invoice.company_id}</div>
                <div>Fattura nr: {invoice.number}</div>
@@ -36,342 +83,19 @@ const Card = (props) => {
                <div>P.Iva: {invoice.vat_number}</div>
                <div className="font-bold">Scadenza: {invoice.next_due_date}</div>
                <td> Totale: &euro; {invoice.amount}</td>
-                                   <td><div className="badge badge-error gap-8">
-                                       {invoice.status}
-                                   </div></td>
-               <div className="card-actions justify-end">
-                 <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="btn btn-primary">Link Fattura</button>
+                                   
+               <div className="flex justify-end mt-4">
+                 <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="mb-2 mr-2 py-2 px-2 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase">Link Fattura</button>
+                 <label onClick={() => setId(invoice.id)} htmlFor="edit-modal" className="cursor-pointer mb-2 py-2 px-2 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase">Modifica data</label>
                </div>
              </div>
            </div>
+           </>
              )
            }
            })
          }
-         
-   </div>  
-            )
-          }
-        } 
-         
-      }
-       
-        <div id="1" className= "w-1/4">
-         
-              {
-                [...props.invoices.invoices].map((invoice, k) => {
-                  if(new Date(invoice.next_due_date).getMonth() == 1 && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
-                  return (
-                    <div className="card w-96 bg-base-100 shadow-xl mr-4">
-                    <div className="card-body">
-                    <h2 className="card-title">{invoice.company_name}</h2>
-                    <div>ID azienda: {invoice.company_id}</div>
-                    <div>Fattura nr: {invoice.number}</div>
-                    <div>Data: {invoice.date}</div>
-                    <div>P.Iva: {invoice.vat_number}</div>
-                    <div className="font-bold">Scadenza: {invoice.next_due_date}</div>
-                    <td> Totale: &euro; {invoice.amount}</td>
-                                        <td><div className="badge badge-error gap-2">
-                                            {invoice.status}
-                                        </div></td>
-                    <div className="card-actions justify-end">
-                      <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="btn btn-primary">Link Fattura</button>
-                    </div>
-                  </div>
-                </div>
-                  )
-                }
-                })
-              }
-              
-        </div>
-        <div id="2" className= "w-1/4">
-         
-              {
-                [...props.invoices.invoices].map((invoice, k) => {
-                  if(new Date(invoice.next_due_date).getMonth() == 2 && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
-                  return (
-                    <div className="card w-96 bg-base-100 shadow-xl mr-4">
-                    <div className="card-body">
-                    <h2 className="card-title">{invoice.company_name}</h2>
-                    <div>ID azienda: {invoice.company_id}</div>
-                    <div>Fattura nr: {invoice.number}</div>
-                    <div>Data: {invoice.date}</div>
-                    <div>P.Iva: {invoice.vat_number}</div>
-                    <div className="font-bold">Scadenza: {invoice.next_due_date}</div>
-                    <td> Totale: &euro; {invoice.amount}</td>
-                                        <td><div className="badge badge-error gap-2">
-                                            {invoice.status}
-                                        </div></td>
-                    <div className="card-actions justify-end">
-                      <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="btn btn-primary">Link Fattura</button>
-                    </div>
-                  </div>
-                </div>
-                  )
-                }
-                })
-              }
-              
-        </div>
-        <div id="3" className= "w-1/4">
-         
-              {
-                [...props.invoices.invoices].map((invoice, k) => {
-                  if(new Date(invoice.next_due_date).getMonth() == 3 && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
-                  return (
-                    <div className="card w-96 bg-base-100 shadow-xl mr-4">
-                    <div className="card-body">
-                    <h2 className="card-title">{invoice.company_name}</h2>
-                    <div>ID azienda: {invoice.company_id}</div>
-                    <div>Fattura nr: {invoice.number}</div>
-                    <div>Data: {invoice.date}</div>
-                    <div>P.Iva: {invoice.vat_number}</div>
-                    <div className="font-bold">Scadenza: {invoice.next_due_date}</div>
-                    <td> Totale: &euro; {invoice.amount}</td>
-                                        <td><div className="badge badge-error gap-2">
-                                            {invoice.status}
-                                        </div></td>
-                    <div className="card-actions justify-end">
-                      <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="btn btn-primary">Link Fattura</button>
-                    </div>
-                  </div>
-                </div>
-                  )
-                }
-                })
-              }
-              
-        </div>
-        <div id="4" className= "w-1/4">
-         
-              {
-                [...props.invoices.invoices].map((invoice, k) => {
-                  if(new Date(invoice.next_due_date).getMonth() == 4 && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
-                  return (
-                    <div className="card w-96 bg-base-100 shadow-xl mr-4">
-                    <div className="card-body">
-                    <h2 className="card-title">{invoice.company_name}</h2>
-                    <div>ID azienda: {invoice.company_id}</div>
-                    <div>Fattura nr: {invoice.number}</div>
-                    <div>Data: {invoice.date}</div>
-                    <div>P.Iva: {invoice.vat_number}</div>
-                    <div className="font-bold">Scadenza: {invoice.next_due_date}</div>
-                    <td> Totale: &euro; {invoice.amount}</td>
-                                        <td><div className="badge badge-error gap-2">
-                                            {invoice.status}
-                                        </div></td>
-                    <div className="card-actions justify-end">
-                      <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="btn btn-primary">Link Fattura</button>
-                    </div>
-                  </div>
-                </div>
-                  )
-                }
-                })
-              }
-              
-        </div><div id="5" className= "w-1/4">
-         
-         {
-           [...props.invoices.invoices].map((invoice, k) => {
-             if(new Date(invoice.next_due_date).getMonth() == 5 && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
-             return (
-               <div className="card w-96 bg-base-100 shadow-xl mr-4">
-               <div className="card-body">
-               <h2 className="card-title">{invoice.company_name}</h2>
-               <div>ID azienda: {invoice.company_id}</div>
-               <div>Fattura nr: {invoice.number}</div>
-               <div>Data: {invoice.date}</div>
-               <div>P.Iva: {invoice.vat_number}</div>
-               <div className="font-bold">Scadenza: {invoice.next_due_date}</div>
-               <td> Totale: &euro; {invoice.amount}</td>
-                                        <td><div className="badge badge-error gap-2">
-                                            {invoice.status}
-                                        </div></td>
-               <div className="card-actions justify-end">
-               <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="btn btn-primary">Link Fattura</button>
-               </div>
-             </div>
-           </div>
-             )
-           }
-           })
-         }
-         
-   </div><div id="6" className= "w-1/4">
-         
-         {
-           [...props.invoices.invoices].map((invoice, k) => {
-             if(new Date(invoice.next_due_date).getMonth() == 6 && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
-             return (
-               <div className="card w-96 bg-base-100 shadow-xl mr-4">
-               <div className="card-body">
-               <h2 className="card-title">{invoice.company_name}</h2>
-               <div>ID azienda: {invoice.company_id}</div>
-               <div>Fattura nr: {invoice.number}</div>
-               <div>Data: {invoice.date}</div>
-               <div>P.Iva: {invoice.vat_number}</div>
-               <div className="font-bold">Scadenza: {invoice.next_due_date}</div>
-               <td> Totale: &euro; {invoice.amount}</td>
-                                        <td><div className="badge badge-error gap-2">
-                                            {invoice.status}
-                                        </div></td>
-               <div className="card-actions justify-end">
-               <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="btn btn-primary">Link Fattura</button>
-               </div>
-             </div>
-           </div>
-             )
-           }
-           })
-         }
-         
-   </div><div id="7" className= "w-1/4">
-         
-         {
-           [...props.invoices.invoices].map((invoice, k) => {
-             if(new Date(invoice.next_due_date).getMonth() == 7 && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
-             return (
-               <div className="card w-96 bg-base-100 shadow-xl mr-4">
-               <div className="card-body">
-               <h2 className="card-title">{invoice.company_name}</h2>
-               <div>ID azienda: {invoice.company_id}</div>
-               <div>Fattura nr: {invoice.number}</div>
-               <div>Data: {invoice.date}</div>
-               <div>P.Iva: {invoice.vat_number}</div>
-               <div className="font-bold">Scadenza: {invoice.next_due_date}</div>
-               <td> Totale: &euro; {invoice.amount}</td>
-                                        <td><div className="badge badge-error gap-2">
-                                            {invoice.status}
-                                        </div></td>
-               <div className="card-actions justify-end">
-               <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="btn btn-primary">Link Fattura</button>
-               </div>
-             </div>
-           </div>
-             )
-           }
-           })
-         }
-         
-   </div><div id="8" className="  h-96 grid-cols-8">
-         
-         {
-           [...props.invoices.invoices].map((invoice, k) => {
-             if(new Date(invoice.next_due_date).getMonth() == 8 && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
-             return (
-               <div className="card min-w-min w-96 h-96 bg-base-100 shadow-xl mr-4">
-               <div className="card-body">
-               <h2 className="card-title">{invoice.company_name}</h2>
-               <div>ID azienda: {invoice.company_id}</div>
-               <div>Fattura nr: {invoice.number}</div>
-               <div>Data: {invoice.date}</div>
-               <div>P.Iva: {invoice.vat_number}</div>
-               <div className="font-bold">Scadenza: {invoice.next_due_date}</div>
-               <td> Totale: &euro; {invoice.amount}</td>
-                                        <td><div className="badge badge-error gap-2">
-                                            {invoice.status}
-                                        </div></td>
-               <div className="card-actions justify-end">
-               <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="btn btn-primary">Link Fattura</button>
-               </div>
-             </div>
-           </div>
-             )
-           }
-           })
-         }
-         
-   </div>
-   <div id="9" className= "w-1/4">
-         
-              {
-                [...props.invoices.invoices].map((invoice, k) => {
-                  if(new Date(invoice.next_due_date).getMonth() == 9 && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
-                  return (
-                    <div className="card w-96 bg-base-100 shadow-xl mr-4">
-                    <div className="card-body">
-                    <h2 className="card-title">{invoice.company_name}</h2>
-                    <div>ID azienda: {invoice.company_id}</div>
-                    <div>Fattura nr: {invoice.number}</div>
-                    <div>Data: {invoice.date}</div>
-                    <div>P.Iva: {invoice.vat_number}</div>
-                    <div className="font-bold">Scadenza: {invoice.next_due_date}</div>
-                    <td> Totale: &euro; {invoice.amount}</td>
-                                        <td><div className="badge badge-error gap-2">
-                                            {invoice.status}
-                                        </div></td>                    <div className="card-actions justify-end">
-                      <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="btn btn-primary">Link Fattura</button>
-                    </div>
-                  </div>
-                </div>
-                  )
-                }
-                })
-              }
-              
-        </div>
-        <div id="10" className= "w-1/4">
-         
-              {
-                [...props.invoices.invoices].map((invoice, k) => {
-                  if(new Date(invoice.next_due_date).getMonth() == 10 && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
-                  return (
-                    <div className="card w-96 bg-base-100 shadow-xl mr-4">
-                    <div className="card-body">
-                    <h2 className="card-title">{invoice.company_name}</h2>
-                    <div>ID azienda: {invoice.company_id}</div>
-                    <div>Fattura nr: {invoice.number}</div>
-                    <div>Data: {invoice.date}</div>
-                    <div>P.Iva: {invoice.vat_number}</div>
-                    <div className="font-bold">Scadenza: {invoice.next_due_date}</div>
-                    <td> Totale: &euro; {invoice.amount}</td>
-                                        <td><div className="badge badge-error gap-2">
-                                            {invoice.status}
-                                        </div></td>
-                    <div className="card-actions justify-end">
-                    <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="btn btn-primary">Link Fattura</button>
-                    </div>
-                  </div>
-                </div>
-                  )
-                }
-                })
-              }
-              
-        </div>
-        <div id="11" className= "w-1/4">
-         
-              {
-                [...props.invoices.invoices].map((invoice, k) => {
-                  if(new Date(invoice.next_due_date).getMonth() == 11 && new Date(invoice.next_due_date).getFullYear() == new Date().getFullYear() ){
-                  return (
-                    <div className="card w-96 bg-base-100 shadow-xl mr-4">
-                    <div className="card-body">
-                    <h2 className="card-title">{invoice.company_name}</h2>
-                    <div>ID azienda: {invoice.company_id}</div>
-                    <div>Fattura nr: {invoice.number}</div>
-                    <div>Data: {invoice.date}</div>
-                    <div>P.Iva: {invoice.vat_number}</div>
-                    <div className="font-bold">Scadenza: {invoice.next_due_date}</div>
-                    <td> Totale: &euro; {invoice.amount}</td>
-                                        <td><div className="badge badge-error gap-2">
-                                            {invoice.status}
-                                        </div></td>
-                    <div className="card-actions justify-end">
-                      <button onClick={() => {window.open(invoice.url, '_blank').focus();}} className="btn btn-primary">Link Fattura</button>
-                    </div>
-                  </div>
-                </div>
-                  )
-                }
-                })
-              }
-              
-        </div>
-      </div>
-
+    </div>
     </>
   );
 };

@@ -12,13 +12,23 @@ export default function Home() {
   useEffect(() => {
     async function getData() {
       try{
-      const response = await fetch('http://localhost:8080/invoices', {
-        method: "GET"
+      const headers = new Headers({
+        'Content-Type': 'application/json',
+        'Authorization': sessionStorage.getItem('auth')
       })
-      if(!response.ok){
+      const response = await fetch('http://localhost:8080/invoices', {
+        method: "GET",
+        headers: headers,
+      })
+      if(response.status == 403){
+        window.location.replace('/login');
+        sessionStorage.clear();   
+      }
+      else if (!response.ok){
         throw new Error(
           `HTTP ERROR -> The status is: ${response.status}`
         )
+        
       }
       let actualData = await response.json();
       setInvoices(actualData);
@@ -35,13 +45,19 @@ export default function Home() {
 
   return (
     <>
-      <Navbar />
       {loading && <div>A moment please...</div>}
       {error && (
-        <div>{`There is a problem fetching the post data - ${error}`}</div>
+        <div className="toast toast-top toast-end">
+        <div className="alert alert-error">
+          <div>
+            <span>{`There is a problem fetching the post data - ${error}`}</span>
+          </div>
+        </div>
+      </div>
       )}
       {invoices &&
       <>
+        <Navbar />
         <div className="container mx-auto h-1/2">
           <Carousel invoices={invoices} />
         <div className="divider"></div> 
