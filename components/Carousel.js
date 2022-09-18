@@ -33,7 +33,7 @@ const Card = (props) => {
       headers: {
         'Content-type': 'application/json; charset=UTF-8',
       },
-    }).then((response) => response.json()).then(response => {console.log(response)}).catch((err) => console.log(err.message))
+    }).then((response) => {response.json()}).then(response => {console.log(response); window.location.reload()}).catch((err) => console.log(err.message))
   }
 
 
