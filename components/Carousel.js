@@ -24,7 +24,7 @@ const Card = (props) => {
   }
 
   const changeDate = () => {
-    fetch('http://localhost:8080/invoices', {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/invoices`, {
       method: 'PATCH',
       body: JSON.stringify({
         id: id,

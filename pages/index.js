@@ -16,7 +16,7 @@ export default function Home() {
         'Content-Type': 'application/json',
         'Authorization': sessionStorage.getItem('auth')
       })
-      const response = await fetch('http://localhost:8080/invoices', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invoices`, {
         method: "GET",
         headers: headers,
       })

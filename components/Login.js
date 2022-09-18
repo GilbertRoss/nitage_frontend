@@ -23,8 +23,7 @@ const Login = () => {
                 password: password
             })
         };
-
-        fetch('http://localhost:8080/auth/login', options)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, options)
             .then(response => response.json())
             .then(response => {
                 sessionStorage.setItem('auth', response.access_token);
