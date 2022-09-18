@@ -43,9 +43,9 @@ const Card = (props) => {
     <input type="checkbox" id="edit-modal" className="modal-toggle" />
 <div className="modal">
   <div className="modal-box">
-  <label for="edit-modal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+  <label htmlFor="edit-modal" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
     <div className="font-bold text-2xl mt-4 mb-4">Modifica data di pagamento</div>
-    <input type="date" value={date} onChange={onChangeDate}  class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date"></input>
+    <input type="date" value={date} onChange={onChangeDate}  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date"></input>
     <div className="modal-action">
       <label onClick={changeDate} htmlFor="edit-modal" className="cursor-pointer mb-2 py-2 px-2 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase">Salva</label>
     </div>
