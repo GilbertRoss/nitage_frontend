@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@asseinfo/react-kanban": "^2.2.0",
+    "@dnd-kit/core": "^6.0.5",
     "daisyui": "^2.27.0",
     "next": "12.2.5",
     "react": "18.2.0",

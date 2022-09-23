@@ -6,8 +6,30 @@ import Table from "../components/Table";
 
 export default function Home() {
   const [invoices, setInvoices] = useState(null);
+  const [board, setBoard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const months = [
+    'Gennaio',
+    'Febbraio',
+    'Marzo',
+    'Aprile',
+    'Maggio',
+    'Giugno',
+    'Luglio',
+    'Agosto',
+    'Settembre',
+    'Ottobre',
+    'Novembre',
+    'Dicembre'
+  ]
+
+  const filterDate = (invoices,month, startDate, endDate) => {
+    let i = 0;
+    let invoice = invoices.filter(invoice => new Date(invoice.next_due_date).getMonth() == month && new Date(invoice.next_due_date).getDate() <= endDate && new Date(invoice.next_due_date).getDate() >= startDate)
+    
+    return invoice
+  }
 
   useEffect(() => {
     async function getData() {
@@ -31,7 +53,44 @@ export default function Home() {
         
       }
       let actualData = await response.json();
+      console.log(actualData["invoices"])
+      const board = {
+        columns: [
+          {
+            id: new Date().getMonth()-1+"-0",
+            title: <div className="font-bold text-4xl mb-8 mr-16">{months[new Date().getMonth()-1]}</div>,
+            cards: filterDate(actualData["invoices"],new Date().getMonth()-1, 0,15)
+          },
+          {
+            id: new Date().getMonth()-1 + "-15",
+            title: <div className="font-bold text-4xl mb-8 mr-16">{months[new Date().getMonth()-1]}</div>,
+            cards: filterDate(actualData["invoices"],new Date().getMonth()-1, 16,31)
+          },
+          {
+            id: new Date().getMonth() + "-0",
+            title: <div className="font-bold text-4xl mb-8">{months[new Date().getMonth()]}</div>,
+            cards: filterDate(actualData["invoices"],new Date().getMonth(), 0,15)
+          },
+          {
+            id: new Date().getMonth() + "-15",
+            title: <div className="font-bold text-4xl mb-8">{months[new Date().getMonth()]}</div>,
+            cards: filterDate(actualData["invoices"],new Date().getMonth(), 16,31)
+          },
+          {
+            id: new Date().getMonth()+1 +"-0",
+            title: <div className="font-bold text-4xl mb-8">{months[new Date().getMonth()+1]}</div>,
+            cards: filterDate(actualData["invoices"],new Date().getMonth()+1, 0,15)
+          },
+          {
+            id: new Date().getMonth()+1 +"-15",
+            title: <div className="font-bold text-4xl mb-8">{months[new Date().getMonth()+1]}</div>,
+            cards: filterDate(actualData["invoices"],new Date().getMonth()+1, 16,31)
+          },
+        ]
+      }
+      console.log(board)
       setInvoices(actualData);
+      setBoard(board);
       setError(null);
     }catch(err){
       setError(err.message);
@@ -58,8 +117,8 @@ export default function Home() {
       {invoices &&
       <>
         <Navbar />
-        <div className="container mx-auto h-1/2">
-          <Carousel invoices={invoices} />
+        <div className="px-64 mx-auto">
+          <Carousel board={board} />
         <div className="divider"></div> 
         <div className="font-bold text-4xl mb-8">Fatture degli anni precedenti</div>
         <Table invoices={invoices}></Table>
