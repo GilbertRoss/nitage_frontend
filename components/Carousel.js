@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Card from './Card';
 import dynamic from 'next/dynamic'
 import '@asseinfo/react-kanban/dist/styles.css'
 
@@ -8,9 +7,11 @@ const Board = dynamic(() => import('@asseinfo/react-kanban'), {
 })
 
 const Carousel = (props) => {
-  const [month, setMonth] = useState(new Date().getMonth());
-  const [date, setDate] = useState();
-  const [id, setId] = useState();
+  const [loading, setLoading] = useState(false);
+  const [date, setDate] = useState("");
+  const [id, setId] = useState("");
+  const id_modal = null;
+  const modal_flag = false;
   const [modal, setModal] = useState(false);
   const months = [
     'Gennaio',
@@ -27,16 +28,24 @@ const Carousel = (props) => {
     'Dicembre'
   ]
 
-  const onCardEnd = (card,destination, source) =>{
-    console.log(card)
-    console.log(source)
-    console.log(destination)
-    setId(card.id);
-    console.log(id)
-    setModal(true);
-    console.log(modal)
-    window.location = '#my-modal-2';
+  const formatDate = (source) =>{
+    console.log()
+    if((parseInt(source.toColumnId.split('-')[0])+1)<10){
+      console.log(`${new Date().getFullYear()}-0${parseInt(source.toColumnId.split('-')[0])+1}-01`)
+      return `${new Date().getFullYear()}-0${parseInt(source.toColumnId.split('-')[0])+1}-01`
+    }else{
+      console.log(`${new Date().getFullYear()}-${parseInt(source.toColumnId.split('-')[0])+1}-01`)
+      return `${new Date().getFullYear()}-${parseInt(source.toColumnId.split('-')[0])+1}-01` 
+    }
+  }
 
+  const onCardEnd = (card,destination, source) =>{
+    setDate(formatDate(source))
+    console.log(card)
+    setId(card.id)
+    console.log(id_modal)
+    modal_flag= true;
+    window.location = '#modify-date';
   }
 
   const onChangeDate = (event) => {
@@ -54,37 +63,26 @@ const Carousel = (props) => {
         'Content-type': 'application/json; charset=UTF-8',
         'Authorization': sessionStorage.getItem('auth'),
       },
-    }).then((response) => {response.json()}).then(response => {console.log(response); window.location.reload()}).catch((err) => console.log(err.message))
+    }).then((response) => {response.json()}).then(response => {console.log(response);window.location = ""}).catch((err) => console.log(err.message))
   }
 
 
   const buttonClass = "py-2 px-4 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase";
   return (
     <>
-    <input type="checkbox" id="edit-modal" className="modal-toggle" />
-<div className="modal">
+
+  <div className="modal" id="modify-date">
   <div className="modal-box">
-  <label htmlFor="edit-modal" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+  <label  onClick={() => {window.location = ""}} className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
     <div className="font-bold text-2xl mt-4 mb-4">Modifica data di pagamento</div>
     <input type="date" value={date} onChange={onChangeDate}  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date"></input>
     <div className="modal-action">
-      <label onClick={changeDate} htmlFor="edit-modal" className="cursor-pointer mb-2 py-2 px-2 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase">Salva</label>
+      <label onClick={changeDate} htmlFor="modify-date" className="cursor-pointer mb-2 py-2 px-2 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase">Salva</label>
     </div>
   </div>
 </div>
-{modal && <>
-  <div className="modal" id="my-modal-2">
-  <div className="modal-box">
-  <label htmlFor="edit-modal" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
-    <div className="font-bold text-2xl mt-4 mb-4">Modifica data di pagamento</div>
-    <input type="date" value={date} onChange={onChangeDate}  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date"></input>
-    <div className="modal-action">
-      <label onClick={changeDate} htmlFor="edit-modal" className="cursor-pointer mb-2 py-2 px-2 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase">Salva</label>
-    </div>
-  </div>
-</div>
-</>
-}
+
+
 
 
       
@@ -93,7 +91,7 @@ const Carousel = (props) => {
 <Board onCardDragEnd={onCardEnd}
   renderCard={({amount, company_id, company_name, date, id, id_fatture_cloud, next_due_date, number, status, url, vat_number}, {}) => (
     
-    <div className="card w-96 bg-base-100 shadow-xl mr-4 mt-4" dragging="true">
+    <div className="card w-64 bg-base-100 shadow-xl mt-4" dragging="true">
     <div className="card-body">
     <span className={status =='not_paid' ? "indicator-item badge badge-error" : "indicator-item badge badge-success gap-8" }>{status}</span> 
     <h2 className="card-title">{company_name}</h2>
@@ -106,7 +104,7 @@ const Carousel = (props) => {
                         
     <div className="mt-4">
       <button onClick={() => {window.open(url, '_blank').focus();}} className="mb-6 mr-2 py-2 px-2 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase">Link Fattura</button>
-      <label onClick={() => setId(id)} htmlFor="edit-modal" className="cursor-pointer mb-2 py-2 px-2 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase">Modifica data</label>
+      <label onClick={() =>  window.location = '#modify-date'} htmlFor="edit-modal" className="cursor-pointer mb-2 py-2 px-2 border-4 border-black font-bold bg-nitage-green text-black roundedborder-4 border-black font-bold bg-nitage-green text-black rounded-lg uppercase">Modifica data</label>
     </div>
   </div>
 </div>

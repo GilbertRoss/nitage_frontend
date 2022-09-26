@@ -23,7 +23,9 @@ const Table = (props) => {
                 <tbody>
                     {
                         [...props.invoices.invoices].map((invoice, k) => {
-                            if (new Date(invoice.next_due_date).getFullYear() != new Date().getFullYear()) {
+                            console.log((new Date(invoice.next_due_date).getMonth()) , new Date().getMonth()-1);
+                            console.log(parseInt((new Date(invoice.next_due_date).getMonth)) < parseInt(new Date().getMonth-1))
+                            if (new Date(invoice.next_due_date).getFullYear() != new Date().getFullYear() || parseInt((new Date(invoice.next_due_date).getMonth())) < parseInt(new Date().getMonth()-1) && parseInt((new Date(invoice.next_due_date).getMonth())) < parseInt(new Date().getMonth()+1) ) {
                                 return (
 
 
